@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZhaNutriBalance — Персональный трекер питания</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F7EBE8">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+    <!-- Иконки FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js для графиков в статистике -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхняя шапка -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-seedling logo-icon"></i>
+                <h1>ZhaNutriBalance</h1>
+            </div>
+            <div class="header-controls">
+                <button id="themeToggleBtn" title="Сменить тему"><i class="fa-solid fa-moon"></i></button>
+                <button id="backupBtn" title="Резервная копия"><i class="fa-solid fa-download"></i></button>
+                <label for="importFile" class="icon-btn" title="Импорт данных"><i class="fa-solid fa-upload"></i></label>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+        </header>
+
+        <!-- Навигационные вкладки -->
+        <nav class="app-nav">
+            <button class="nav-btn active" data-tab="diary"><i class="fa-solid fa-utensils"></i> Рацион</button>
+            <button class="nav-btn" data-tab="calendar"><i class="fa-solid fa-calendar-days"></i> Календарь</button>
+            <button class="nav-btn" data-tab="recipes"><i class="fa-solid fa-book-open"></i> Рецепты</button>
+            <button class="nav-btn" data-tab="stats"><i class="fa-solid fa-chart-pie"></i> Статистика</button>
+            <button class="nav-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Моя норма</button>
+        </nav>
+
+        <!-- Основной контент (Двухколоночный интерфейс на ПК) -->
+        <main class="app-main">
+            
+            <!-- ВКЛАДКА 1: РАЦИОН И БАЗА ПРОДУКТОВ -->
+            <section id="diary-tab" class="tab-content active">
+                <div class="diary-layout">
+                    
+                    <!-- Левая колонка: Рацион за день -->
+                    <div class="main-column">
+                        <div class="card date-card">
+                            <div class="date-navigator">
+                                <button id="prevDayBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                                <span id="currentDateDisplay">Сегодня, 2 ноября</span>
+                                <button id="nextDayBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <button id="todayBtn" class="btn-text">Сегодня</button>
+                        </div>
+
+                        <!-- Сводка дня (КБЖУ + Клетчатка) -->
+                        <div class="card summary-card">
+                            <h3>Сводка за день</h3>
+                            <div class="summary-grid">
+                                <div class="stat-circle">
+                                    <span id="calConsumed">0</span>
+                                    <small>из <span id="calGoal">2000</span> ккал</small>
+                                </div>
+                                <div class="macros-bars">
+                                    <div class="macro-bar-item">
+                                        <div class="macro-info"><span>Белки</span> <span id="proteinText">0 / 100 г</span></div>
+                                        <div class="progress"><div id="proteinProgress" class="progress-fill" style="width: 0%"></div></div>
+                                    </div>
+                                    <div class="macro-bar-item">
+                                        <div class="macro-info"><span>Жиры</span> <span id="fatText">0 / 70 г</span></div>
+                                        <div class="progress"><div id="fatProgress" class="progress-fill" style="width: 0%"></div></div>
+                                    </div>
+                                    <div class="macro-bar-item">
+                                        <div class="macro-info"><span>Углеводы</span> <span id="carbText">0 / 250 г</span></div>
+                                        <div class="progress"><div id="carbProgress" class="progress-fill" style="width: 0%"></div></div>
+                                    </div>
+                                    <div class="macro-bar-item fiber-item">
+                                        <div class="macro-info"><span>Клетчатка</span> <span id="fiberText">0 / 30 г</span></div>
+                                        <div class="progress"><div id="fiberProgress" class="progress-fill fiber" style="width: 0%"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Список съеденного -->
+                        <div class="card meals-card">
+                            <div class="card-header">
+                                <h3>Приемы пищи</h3>
+                                <button id="copyYesterdayBtn" class="btn-secondary btn-sm"><i class="fa-solid fa-copy"></i> Копировать вчера</button>
+                            </div>
+                            <div id="mealsList" class="meals-list">
+                                <!-- Элементы рациона добавляются через JS -->
+                                <div class="empty-state">Ваш рацион пуст. Выберите продукты из базы справа.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка: База продуктов (сворачиваемая на ПК, выдвижная на моб.) -->
+                    <aside class="sidebar-column" id="productSidebar">
+                        <div class="card products-card">
+                            <div class="collapsible-header" id="toggleProductsPanel">
+                                <h3><i class="fa-solid fa-basket-shopping"></i> База продуктов</h3>
+                                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                            </div>
+                            <div class="products-panel-body" id="productsPanelBody">
+                                <div class="search-box">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="productSearchInput" placeholder="Поиск продуктов...">
+                                </div>
+                                <div class="categories-chips" id="categoriesChips">
+                                    <!-- Чипсы категорий -->
+                                </div>
+                                <div class="products-action-bar">
+                                    <button id="openAddProductModal" class="btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Свой продукт</button>
+                                </div>
+                                <div id="productsListContainer" class="products-list">
+                                    <!-- Список продуктов -->
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 2: КАЛЕНДАРЬ -->
+            <section id="calendar-tab" class="tab-content">
+                <div class="card calendar-card">
+                    <div class="calendar-header">
+                        <button id="prevMonthBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h2 id="calendarMonthTitle">Ноябрь 2026</h2>
+                        <button id="nextMonthBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="weekdays-grid">
+                        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                    </div>
+                    <div class="days-grid" id="calendarDaysGrid">
+                        <!-- Дни месяца -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 3: РЕЦЕПТЫ -->
+            <section id="recipes-tab" class="tab-content">
+                <div class="card recipes-card">
+                    <div class="card-header">
+                        <h2>Конструктор рецептов</h2>
+                        <button id="openCreateRecipeModal" class="btn-primary"><i class="fa-solid fa-plus"></i> Новый рецепт</button>
+                    </div>
+                    <div id="recipesListContainer" class="recipes-grid">
+                        <!-- Карточки рецептов -->
+                        <div class="empty-state">У вас пока нет сохраненных рецептов. Создайте свое блюдо!</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 4: СТАТИСТИКА -->
+            <section id="stats-tab" class="tab-content">
+                <div class="stats-layout">
+                    <div class="card stats-header-card">
+                        <h2>Статистика и аналитика</h2>
+                        <div class="period-selector">
+                            <button class="period-btn active" data-days="7">7 дней</button>
+                            <button class="period-btn" data-days="30">30 дней</button>
+                            <button class="period-btn" data-days="90">90 дней</button>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="card chart-card">
+                            <h3>Динамика калорийности</h3>
+                            <canvas id="caloriesChart"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Потребление клетчатки (г)</h3>
+                            <canvas id="fiberChart"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Среднее БЖУ</h3>
+                            <canvas id="macrosChart"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Динамика веса (кг)</h3>
+                            <div class="weight-input-group">
+                                <input type="number" id="currentWeightInput" step="0.1" placeholder="Ваш вес сегодня">
+                                <button id="saveWeightBtn" class="btn-primary btn-sm">Записать</button>
+                            </div>
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 5: МОЯ НОРМА (НАСТРОЙКИ КБЖУ) -->
+            <section id="settings-tab" class="tab-content">
+                <div class="card settings-card">
+                    <h2>Расчет суточной нормы (Миффлин — Сан Жеор)</h2>
+                    <form id="userSettingsForm" class="settings-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Пол</label>
+                                <select id="settingGender">
+                                    <option value="male">Мужской</option>
+                                    <option value="female">Женский</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Возраст (лет)</label>
+                                <input type="number" id="settingAge" value="25" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Рост (см)</label>
+                                <input type="number" id="settingHeight" value="170" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Вес (кг)</label>
+                                <input type="number" id="settingWeight" value="65" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Уровень физической активности</label>
+                            <select id="settingActivity">
+                                <option value="1.2">Минимальная активность (сидячая работа)</option>
+                                <option value="1.375">Низкая активность (легкие тренировки 1-3 раза)</option>
+                                <option value="1.55">Умеренная активность (тренировки 3-5 раз)</option>
+                                <option value="1.725">Высокая активность (интенсивные тренировки 6-7 раз)</option>
+                                <option value="1.9">Экстремальная активность (тяжелая физическая работа)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Цель</label>
+                            <select id="settingGoal">
+                                <option value="maintain">Поддержание веса</option>
+                                <option value="lose">Похудение (-15% калорий)</option>
+                                <option value="gain">Набор мышечной массы (+15% калорий)</option>
+                            </select>
+                        </div>
+                        <button type="button" id="calculateNormsBtn" class="btn-secondary"><i class="fa-solid fa-calculator"></i> Рассчитать автоматически</button>
+                        
+                        <hr class="divider">
+                        
+                        <h3>Целевые показатели (можно скорректировать вручную)</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Калории (ккал)</label>
+                                <input type="number" id="targetCalories" value="2000" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Белки (г)</label>
+                                <input type="number" id="targetProtein" value="100" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Жиры (г)</label>
+                                <input type="number" id="targetFat" value="70" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Углеводы (г)</label>
+                                <input type="number" id="targetCarbs" value="250" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Клетчатка (г)</label>
+                            <input type="number" id="targetFiber" value="30" required>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Сохранить настройки</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ДОБАВЛЕНИЕ ПРОДУКТА В РАЦИОН -->
+    <div id="addMealModal" class="modal">
+        <div class="modal-content card">
+            <span class="close-modal">&times;</span>
+            <h3 id="modalProductName">Добавить продукт</h3>
+            <p id="modalProductCategory" class="text-muted"></p>
+            <div class="form-group">
+                <label>Количество (граммы / порции)</label>
+                <input type="number" id="mealWeightInput" value="100" min="1" step="1">
+            </div>
+            <div class="calculated-preview">
+                <div>Калории: <strong id="previewCal">0</strong> ккал</div>
+                <div>Белки: <strong id="previewProtein">0</strong> г</div>
+                <div>Жиры: <strong id="previewFat">0</strong> г</div>
+                <div>Углеводы: <strong id="previewCarbs">0</strong> г</div>
+                <div>Клетчатка: <strong id="previewFiber">0</strong> г</div>
+            </div>
+            <button id="confirmAddMealBtn" class="btn-primary">Добавить в рацион</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: СОЗДАНИЕ/ПРАВКА ПРОДУКТА -->
+    <div id="productEditModal" class="modal">
+        <div class="modal-content card">
+            <span class="close-modal">&times;</span>
+            <h3 id="productModalTitle">Новый продукт</h3>
+            <form id="productEditForm">
+                <input type="hidden" id="editProductId">
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="prodName" required>
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="prodCategory">
+                        <option value="Мясо и птица">Мясо и птица</option>
+                        <option value="Рыба и морепродукты">Рыба и морепродукты</option>
+                        <option value="Молочные продукты">Молочные продукты</option>
+                        <option value="Яйца">Яйца</option>
+                        <option value="Крупы">Крупы</option>
+                        <option value="Макаронные изделия">Макаронные изделия</option>
+                        <option value="Овощи">Овощи</option>
+                        <option value="Фрукты и ягоды">Фрукты и ягоды</option>
+                        <option value="Орехи и семена">Орехи и семена</option>
+                        <option value="Масла и жиры">Масла и жиры</option>
+                        <option value="Соусы">Соусы</option>
+                        <option value="Выпечка и хлеб">Выпечка и хлеб</option>
+                        <option value="Сладости">Сладости</option>
+                        <option value="Напитки">Напитки</option>
+                        <option value="Прочее">Прочее</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Калории (на 100г)</label><input type="number" id="prodCal" step="0.1" required></div>
+                    <div class="form-group"><label>Белки (г)</label><input type="number" id="prodProt" step="0.1" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Жиры (г)</label><input type="number" id="prodFat" step="0.1" required></div>
+                    <div class="form-group"><label>Углеводы (г)</label><input type="number" id="prodCarb" step="0.1" required></div>
+                </div>
+                <div class="form-group">
+                    <label>Клетчатка (г на 100г)</label>
+                    <input type="number" id="prodFiber" step="0.1" value="0" required>
+                </div>
+                <button type="submit" class="btn-primary">Сохранить продукт</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: КОНСТРУКТОР РЕЦЕПТОВ -->
+    <div id="recipeModal" class="modal">
+        <div class="modal-content card wide-modal">
+            <span class="close-modal">&times;</span>
+            <h3>Создание рецепта</h3>
+            <div class="form-group">
+                <label>Название блюда</label>
+                <input type="text" id="recipeNameInput" placeholder="Например: Овсяноблин с сыром">
+            </div>
+            <div class="recipe-builder-layout">
+                <div class="recipe-ingredients-side">
+                    <h4>Ингредиенты</h4>
+                    <div id="recipeIngredientsList" class="recipe-ingredients-list">
+                        <div class="empty-state">Ингредиенты не добавлены</div>
+                    </div>
+                    <button type="button" id="addIngredientBtn" class="btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Добавить ингредиент из базы</button>
+                </div>
+                <div class="recipe-summary-side">
+                    <h4>Итог приготовления</h4>
+                    <div class="form-group">
+                        <label>Суммарный сырой вес (г)</label>
+                        <input type="text" id="recipeRawWeight" value="0" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Итоговый вес готового блюда (г)</label>
+                        <input type="number" id="recipeCookedWeight" value="100" min="1">
+                        <small class="text-muted">Укажите вес после варки/жарки для точного пересчета на 100г.</small>
+                    </div>
+                    <div class="recipe-totals-preview">
+                        <div>Калории на 100г: <strong id="recipeCalcCal">0</strong></div>
+                        <div>Белки на 100г: <strong id="recipeCalcProt">0</strong></div>
+                        <div>Жиры на 100г: <strong id="recipeCalcFat">0</strong></div>
+                        <div>Углеводы на 100г: <strong id="recipeCalcCarb">0</strong></div>
+                        <div>Клетчатка на 100г: <strong id="recipeCalcFiber">0</strong></div>
+                    </div>
+                    <button id="saveRecipeBtn" class="btn-primary">Сохранить рецепт</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ВЫБОР ИНГРЕДИЕНТА В РЕЦЕПТ -->
+    <div id="selectIngredientModal" class="modal">
+        <div class="modal-content card">
+            <span class="close-modal">&times;</span>
+            <h3>Выберите ингредиент</h3>
+            <input type="text" id="ingredientSearchInput" placeholder="Поиск..." class="form-group">
+            <div id="ingredientSelectList" class="select-ingredient-list"></div>
+        </div>
+    </div>
+
+    <!-- Скрипты приложения -->
+    <script src="app.js"></script>
+    <script>
+        // Регистрация Service Worker для PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
+                    .catch(err => console.log('ServiceWorker error:', err));
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,20 @@
+{
+  "name": "ZhaNutriBalance",
+  "short_name": "ZhaNutri",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#FDF9F8",
+  "theme_color": "#F7EBE8",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

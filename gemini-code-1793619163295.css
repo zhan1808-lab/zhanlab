@@ -1,0 +1,847 @@
+:root {
+    --bg-main: #FDF9F8;
+    --card-bg: #FFFFFF;
+    --text-main: #4A3E3D;
+    --text-muted: #8C7B79;
+    --pastel-pink: #F7EBE8;
+    --dusty-rose: #D9A5B3;
+    --muted-berry: #A64B60;
+    --blush-pink: #FCE4EC;
+    --ivory: #FFFBF9;
+    --beige: #F4EBE1;
+    --border-color: #EEDCD9;
+    --success: #6B9080;
+    --shadow: 0 8px 24px rgba(166, 75, 96, 0.06);
+    --radius: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-main: #1E1A1B;
+    --card-bg: #2B2527;
+    --text-main: #F2EBE9;
+    --text-muted: #B8A8A6;
+    --pastel-pink: #3D2D31;
+    --dusty-rose: #8C5564;
+    --muted-berry: #D96B84;
+    --blush-pink: #4A333B;
+    --ivory: #252022;
+    --beige: #362E2D;
+    --border-color: #4A3C3E;
+    --success: #52796F;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.app-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+/* Шапка */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    padding: 16px 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    font-size: 24px;
+    color: var(--muted-berry);
+}
+
+.logo-area h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.header-controls button, .icon-btn {
+    background: var(--pastel-pink);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted-berry);
+    transition: all 0.2s ease;
+}
+
+.header-controls button:hover, .icon-btn:hover {
+    background: var(--dusty-rose);
+    color: white;
+}
+
+/* Навигация */
+.app-nav {
+    display: flex;
+    gap: 10px;
+    background: var(--card-bg);
+    padding: 10px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.nav-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: var(--pastel-pink);
+    color: var(--muted-berry);
+}
+
+.nav-btn.active {
+    background: var(--muted-berry);
+    color: white;
+}
+
+/* Карточки */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* Вкладки */
+.tab-content {
+    display: none;
+    flex: 1;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Двухколоночный макет */
+.diary-layout {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 20px;
+}
+
+.main-column, .sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Управление датой */
+.date-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+.date-navigator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.date-navigator button {
+    background: var(--pastel-pink);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--muted-berry);
+}
+
+#currentDateDisplay {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--muted-berry);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Сводка дня */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.stat-circle {
+    background: var(--pastel-pink);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 4px solid var(--dusty-rose);
+}
+
+.stat-circle span {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--muted-berry);
+}
+
+.stat-circle small {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.macros-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.macro-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.macro-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.progress {
+    height: 8px;
+    background: var(--pastel-pink);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--dusty-rose);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-fill.fiber {
+    background: var(--success);
+}
+
+/* Приемы пищи */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.meals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.meal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--ivory);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.meal-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.meal-info p {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.meal-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.meal-actions span {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted-berry);
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.delete-btn:hover {
+    color: #e63946;
+}
+
+/* База продуктов в боковой панели */
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.products-panel-body {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    color: var(--text-main);
+    outline: none;
+}
+
+.categories-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.chip {
+    padding: 6px 12px;
+    background: var(--pastel-pink);
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.chip.active, .chip:hover {
+    background: var(--muted-berry);
+    color: white;
+}
+
+.products-action-bar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--ivory);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.product-item:hover {
+    border-color: var(--dusty-rose);
+    transform: translateX(2px);
+}
+
+.product-item-info h5 {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.product-item-info p {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.product-item-macros {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-berry);
+    text-align: right;
+}
+
+/* Кнопки */
+.btn-primary {
+    background: var(--muted-berry);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: var(--pastel-pink);
+    color: var(--muted-berry);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--dusty-rose);
+    color: white;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Календарь */
+.calendar-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-header button {
+    background: var(--pastel-pink);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--muted-berry);
+    cursor: pointer;
+}
+
+.weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    background: var(--ivory);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    border-color: var(--muted-berry);
+}
+
+.calendar-day.active {
+    background: var(--muted-berry);
+    color: white;
+    border-color: var(--muted-berry);
+}
+
+.calendar-day.active .day-cals {
+    color: var(--pastel-pink);
+}
+
+.calendar-day .day-num {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.calendar-day .day-cals {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.day-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    align-self: flex-end;
+}
+
+/* Рецепты */
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.recipe-card {
+    background: var(--ivory);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recipe-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.recipe-card-macros {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.recipe-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+/* Статистика */
+.stats-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stats-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.period-selector {
+    display: flex;
+    gap: 6px;
+}
+
+.period-btn {
+    padding: 6px 14px;
+    background: var(--pastel-pink);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted-berry);
+    cursor: pointer;
+}
+
+.period-btn.active {
+    background: var(--muted-berry);
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 320px;
+}
+
+.weight-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.weight-input-group input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* Настройки */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.form-group input, .form-group select {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 10px 0;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    animation: scaleUp 0.2s ease;
+}
+
+.wide-modal {
+    max-width: 700px;
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.calculated-preview {
+    background: var(--ivory);
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+}
+
+.recipe-builder-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.recipe-ingredients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.recipe-totals-preview {
+    background: var(--ivory);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px;
+    font-size: 14px;
+}
+
+/* Адаптивность под мобильные устройства */
+@media (max-width: 900px) {
+    .diary-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-column {
+        order: 2;
+    }
+    
+    .recipe-builder-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .app-container {
+        padding: 10px;
+    }
+    
+    .app-header {
+        padding: 12px 16px;
+    }
+    
+    .logo-area h1 {
+        font-size: 18px;
+    }
+}
